@@ -1,7 +1,13 @@
 name: Web (GitHub Pages)
 
-# Builds the web preview of the app (demo server + simulated people nearby, no backend needed)
-# and publishes it to GitHub Pages at https://bluesight.si
+# Publishes https://bluesight.si : the landing page (landing/) at /, and the web app at /app/
+# (demo server + simulated people nearby, no backend needed).
+#
+# app.bluesight.si: GitHub serves one Pages domain per repo, so the app also gets pushed to a
+# second repo when these are set (Settings -> Secrets and variables -> Actions):
+#   variable APP_REPO          e.g. aketec-systems/bluesight-app
+#   secret   APP_DEPLOY_TOKEN  fine-grained token with Contents: read & write on APP_REPO
+#   variable APP_URL           https://app.bluesight.si  (where the landing page buttons point)
 
 on:
   workflow_dispatch:
@@ -43,13 +49,31 @@ jobs:
         run: npx expo export --platform web
 
       - name: Assemble the site
-        working-directory: mobile
+        env:
+          APP_URL: ${{ vars.APP_URL || '/app/' }}
         run: |
-          mkdir -p ../site
-          node scripts/build-standalone.mjs dist ../site/index.html
-          cp ../site/index.html ../site/404.html
-          echo "bluesight.si" > ../site/CNAME
-          touch ../site/.nojekyll
+          mkdir -p site/app app-site
+          (cd mobile && node scripts/build-standalone.mjs dist ../site/app/index.html)
+          cp landing/* site/
+          sed -i "s|__APP_URL__|$APP_URL|g" site/index.html
+          echo "bluesight.si" > site/CNAME
+          touch site/.nojekyll
+          cp site/app/index.html app-site/index.html
+          cp site/app/index.html app-site/404.html
+          echo "app.bluesight.si" > app-site/CNAME
+          touch app-site/.nojekyll
+
+      - name: Publish the app to app.bluesight.si
+        if: vars.APP_REPO != ''
+        env:
+          TOKEN: ${{ secrets.APP_DEPLOY_TOKEN }}
+          REPO: ${{ vars.APP_REPO }}
+        run: |
+          cd app-site
+          git init -q -b gh-pages
+          git -c user.name="github-actions[bot]" -c user.email="41898099+github-actions[bot]@users.noreply.github.com" add -A
+          git -c user.name="github-actions[bot]" -c user.email="41898099+github-actions[bot]@users.noreply.github.com" commit -q -m "Deploy app from ${GITHUB_SHA::7}"
+          git push -f "https://x-access-token:${TOKEN}@github.com/${REPO}.git" gh-pages
 
       - uses: actions/configure-pages@v5
 

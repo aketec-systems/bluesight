@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Bluesight: dating for the diaspora, light on data</title>
+<meta name="description" content="Meet people near you over Bluetooth, for free, or set your search to a city back home and start matching before you land." />
+<meta name="theme-color" content="#170F33" />
+<meta property="og:title" content="Bluesight" />
+<meta property="og:description" content="Dating for the diaspora. Meet people nearby over Bluetooth, no data needed, or match with people back home before you land." />
+<meta property="og:image" content="https://bluesight.si/icon.png" />
+<meta property="og:url" content="https://bluesight.si/" />
+<link rel="icon" href="favicon.png" />
+<link rel="apple-touch-icon" href="icon.png" />
+<link rel="preload" href="DelaGothicOne-Latin.ttf" as="font" type="font/ttf" crossorigin />
+<style>
+  @font-face { font-family: "Dela"; src: url("DelaGothicOne-Latin.ttf") format("truetype"); font-display: swap; }
+  :root {
+    --midnight: #170F33; --dusk: #221946; --dusk2: #2B2157; --haze: #3A2F6B;
+    --cream: #FFF1E0; --lavender: #B9AEDB; --dim: #8A7FB3;
+    --blue: #5AB4FF; --blue-soft: #A8D6FF; --amber: #FFB21F; --hibiscus: #FF4F6D;
+    --display: "Dela", system-ui, sans-serif;
+    --body: system-ui, -apple-system, Roboto, "Segoe UI", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--midnight); color: var(--cream); font: 17px/1.55 var(--body); overflow-x: hidden; }
+  a { color: inherit; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding-left: 20px; padding-right: 20px; }
+
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 20px 0; }
+  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; font: 24px var(--display); }
+  .brand svg { width: 40px; height: 40px; }
+  .nav-cta { font-weight: 700; font-size: 15px; text-decoration: none; padding: 9px 18px; border-radius: 999px; border: 1.5px solid var(--haze); }
+  .nav-cta:hover { border-color: var(--lavender); }
+
+  .hero { display: grid; grid-template-columns: minmax(0,1.1fr) minmax(0,0.9fr); gap: 40px; align-items: center; padding-top: 48px; padding-bottom: 72px; }
+  h1 { overflow-wrap: anywhere; font: clamp(36px, 6vw, 60px)/1.08 var(--display); margin: 0 0 20px; letter-spacing: -0.5px; }
+  h1 .blue { color: var(--blue); }
+  .lede { font-size: 19px; color: var(--lavender); margin: 0 0 32px; max-width: 34em; }
+  .ctas { display: flex; flex-wrap: wrap; gap: 12px; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; padding: 0 26px; border-radius: 999px; font-weight: 700; font-size: 16px; text-decoration: none; transition: transform .15s ease, filter .15s ease; }
+  .btn:hover { transform: translateY(-1px); filter: brightness(1.08); }
+  .btn-primary { background: var(--hibiscus); color: #fff; }
+  .btn-ghost { border: 1.5px solid var(--haze); color: var(--cream); }
+  .note { margin-top: 14px; font-size: 14px; color: var(--dim); }
+
+  .phone { position: relative; justify-self: center; width: 280px; aspect-ratio: 9 / 18; border-radius: 40px; background: var(--dusk); border: 8px solid var(--ink, #120A2A); box-shadow: 0 30px 80px rgba(0,0,0,.45), 0 0 0 1.5px var(--haze); overflow: hidden; }
+  .phone .bar { display: flex; align-items: center; gap: 8px; padding: 18px 18px 8px; font: 17px var(--display); }
+  .phone .bar svg { width: 26px; height: 26px; }
+  .pill-row { display: flex; gap: 6px; padding: 4px 18px 12px; }
+  .pill { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: var(--dusk2); color: var(--lavender); }
+  .pill.on { background: rgba(90,180,255,.18); color: var(--blue); }
+  .card { position: absolute; left: 18px; right: 18px; top: 92px; bottom: 86px; border-radius: 24px; overflow: hidden; background: linear-gradient(160deg, #FF8A5B, #C2427A 60%, #3A2F6B); }
+  .card .who { position: absolute; left: 0; right: 0; bottom: 0; padding: 18px; background: linear-gradient(transparent, rgba(18,10,42,.85)); }
+  .card .name { font: 22px var(--display); }
+  .card .tag { display: inline-flex; align-items: center; gap: 6px; margin-top: 6px; font-size: 12px; font-weight: 700; color: var(--blue); background: rgba(18,10,42,.6); padding: 4px 10px; border-radius: 999px; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--blue); box-shadow: 0 0 0 0 rgba(90,180,255,.7); animation: ping 2s infinite; }
+  @keyframes ping { 70% { box-shadow: 0 0 0 8px rgba(90,180,255,0); } 100% { box-shadow: 0 0 0 0 rgba(90,180,255,0); } }
+  .silhouette { position: absolute; left: 50%; top: 22%; transform: translateX(-50%); width: 58%; }
+  .actions { position: absolute; left: 0; right: 0; bottom: 20px; display: flex; justify-content: center; gap: 22px; }
+  .actions span { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; background: var(--dusk2); font-size: 22px; }
+  .actions span.like { background: var(--hibiscus); }
+  .receipt { position: absolute; right: -6px; top: 46%; background: var(--midnight); border: 1.5px solid var(--haze); border-radius: 14px; padding: 8px 12px; font-size: 12px; color: var(--lavender); box-shadow: 0 10px 30px rgba(0,0,0,.4); }
+  .receipt b { color: var(--blue); font-size: 15px; display: block; }
+
+  section { padding-top: 64px; padding-bottom: 64px; }
+  h2 { font: clamp(26px, 4vw, 36px)/1.15 var(--display); margin: 0 0 14px; }
+  .sub { color: var(--lavender); margin: 0 0 36px; max-width: 40em; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .tile { background: var(--dusk); border: 1px solid var(--dusk2); border-radius: 20px; padding: 24px; }
+  .tile h3 { margin: 12px 0 8px; font-size: 18px; }
+  .tile p { margin: 0; color: var(--lavender); font-size: 15px; }
+  .ico { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; }
+  .ico svg { width: 24px; height: 24px; }
+  .i-blue { background: rgba(90,180,255,.15); color: var(--blue); }
+  .i-amber { background: rgba(255,178,31,.15); color: var(--amber); }
+  .i-pink { background: rgba(255,79,109,.15); color: var(--hibiscus); }
+
+  table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  th, td { text-align: left; padding: 14px 12px; border-bottom: 1px solid var(--dusk2); }
+  th { color: var(--dim); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: .06em; }
+  td:last-child { text-align: right; font-weight: 700; white-space: nowrap; }
+  .free { color: var(--blue); }
+  .metered { color: var(--amber); }
+  .table-box { background: var(--dusk); border-radius: 20px; padding: 8px 12px; border: 1px solid var(--dusk2); }
+
+  .modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 24px; }
+  .mode { border-radius: 20px; padding: 20px 22px; border: 1.5px solid var(--dusk2); }
+  .mode b { font: 18px var(--display); display: block; margin-bottom: 6px; }
+  .mode p { margin: 0; color: var(--lavender); font-size: 15px; }
+  .mode.default { border-color: var(--blue); }
+
+  .home { background: linear-gradient(135deg, var(--dusk), var(--dusk2)); border-radius: 28px; padding: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: center; }
+  .cities { display: flex; flex-wrap: wrap; gap: 8px; }
+  .cities span { padding: 8px 14px; border-radius: 999px; background: var(--midnight); font-size: 14px; font-weight: 600; color: var(--lavender); }
+  .cities span.sel { background: var(--hibiscus); color: #fff; }
+
+  .final { text-align: center; padding-top: 80px; padding-bottom: 80px; }
+  .final .ctas { justify-content: center; }
+  footer { border-top: 1px solid var(--dusk2); padding: 28px 0 40px; color: var(--dim); font-size: 14px; }
+  footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: space-between; }
+  footer a { color: var(--lavender); text-decoration: none; }
+
+  @media (max-width: 860px) {
+    .hero { grid-template-columns: minmax(0,1fr); padding-top: 24px; padding-bottom: 48px; }
+    .phone { width: 250px; }
+    .grid, .modes { grid-template-columns: 1fr; }
+    .home { grid-template-columns: 1fr; padding: 28px 22px; }
+    .nav-cta { display: none; }
+    .btn { flex: 1 1 auto; }
+    section { padding-top: 48px; padding-bottom: 48px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .dot { animation: none; } .btn { transition: none; } }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="mark" viewBox="0 0 64 64">
+    <path d="M4 32 C16 8 48 8 60 32 C48 56 16 56 4 32 Z" fill="#5AB4FF"/>
+    <circle cx="32" cy="32" r="12.5" fill="#170F33"/>
+    <path d="M32 30.25C32.4 27.7 34 27 35.76 27 38 27 39.5 28.7 39.5 30.7 39.5 34.2 34.5 37 32 40.6 29.5 37 24.5 34.2 24.5 30.7 24.5 28.7 26 27 28.24 27 30 27 31.6 27.7 32 30.25Z" fill="#FF4F6D"/>
+    <circle cx="36.3" cy="28.6" r="1.9" fill="#FFF1E0"/>
+  </symbol>
+</svg>
+
+<header class="wrap">
+  <nav>
+    <a class="brand" href="/"><svg><use href="#mark"/></svg>Bluesight</a>
+    <a class="nav-cta" href="__APP_URL__">Open the app</a>
+  </nav>
+</header>
+
+<main>
+  <div class="wrap hero">
+    <div>
+      <h1>Meet people near you, <span class="blue">or back home.</span></h1>
+      <p class="lede">A dating app for the diaspora, built for places where mobile data is expensive. Swipe, match and chat with people close by over Bluetooth for free, or set your search to a city back home and start matching before you land.</p>
+      <div class="ctas">
+        <a class="btn btn-primary" href="__APP_URL__">Try Bluesight</a>
+        <a class="btn btn-ghost" href="https://github.com/aketec-systems/bluesight/releases/tag/latest-apk">Android APK (beta)</a>
+      </div>
+      <p class="note">The web version runs on demo data with simulated people nearby. Nothing you enter leaves your browser.</p>
+    </div>
+
+    <div class="phone" aria-hidden="true">
+      <div class="bar"><svg><use href="#mark"/></svg>Nearby</div>
+      <div class="pill-row"><span class="pill on">Bluetooth · free</span><span class="pill">3 people</span></div>
+      <div class="card">
+        <svg class="silhouette" viewBox="0 0 100 110"><circle cx="50" cy="34" r="24" fill="#3B2418"/><path d="M26 28c0-16 12-24 24-24s24 8 24 24c-6-6-14-8-24-8s-18 2-24 8z" fill="#170F33"/><path d="M8 110c4-28 22-40 42-40s38 12 42 40z" fill="#3B2418"/></svg>
+        <div class="who"><div class="name">Ama 24</div><span class="tag"><span class="dot"></span>Right here</span></div>
+      </div>
+      <div class="actions"><span>✕</span><span class="like">♥</span></div>
+    </div>
+  </div>
+
+  <section class="wrap">
+    <h2>Two ways to meet</h2>
+    <p class="sub">The phone finds people in the same room for free. The internet is optional, and when you do use it, everything goes in one small request.</p>
+    <div class="grid">
+      <div class="tile">
+        <div class="ico i-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 7 10 10-5 5V2l5 5L7 17"/></svg></div>
+        <h3>Nearby, over Bluetooth</h3>
+        <p>At a party, church, campus, market or club, phones find each other within about 30 m. Cards, likes, matches and chat all go over Bluetooth, with no data used.</p>
+      </div>
+      <div class="tile">
+        <div class="ico i-amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg></div>
+        <h3>Around, here or back home</h3>
+        <p>Browse people around town, or pick any city from the built-in list. A deck of 20 people is about 4 KB.</p>
+      </div>
+      <div class="tile">
+        <div class="ico i-pink"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+        <h3>Chat from anywhere</h3>
+        <p>Messages are end-to-end encrypted. When your match is in range they go over Bluetooth; otherwise they ride the next sync, about 0.1 KB each.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <div class="home">
+      <div>
+        <h2>Search back home</h2>
+        <p class="sub" style="margin:0">Most of us have two places: where we live now and where home is. Pick a city and start matching before you land. People there see you as <b style="color:var(--cream)">Not in town</b>, never a distance, so no one is misled about how close you are. When you arrive, the same match carries on over Bluetooth for free.</p>
+      </div>
+      <div class="cities" aria-label="Example cities">
+        <span>Near me</span><span class="sel">Monrovia</span><span>Lagos</span><span>Accra</span><span>Freetown</span><span>Nairobi</span><span>Kingston</span><span>Addis Ababa</span><span>Kinshasa</span><span>Dakar</span><span>Port-au-Prince</span><span>Kampala</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <h2>You always know what it costs</h2>
+    <p class="sub">The app keeps a live data receipt and a monthly limit, so there are no surprises on your bill.</p>
+    <div class="table-box">
+      <table>
+        <thead><tr><th>Action</th><th style="text-align:right">Data</th></tr></thead>
+        <tbody>
+          <tr><td>Seeing everyone nearby, with cards and photos</td><td class="free">0</td></tr>
+          <tr><td>Liking, matching and chatting with someone nearby</td><td class="free">0</td></tr>
+          <tr><td>Picking a city to search</td><td class="free">0</td></tr>
+          <tr><td>A deck of 20 people around town or back home</td><td class="metered">~3.8 KB</td></tr>
+          <tr><td>A message to a match who isn't nearby</td><td class="metered">~0.1 KB</td></tr>
+          <tr><td>Checking for news when nothing's new</td><td class="metered">~0.4 KB</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="modes">
+      <div class="mode"><b>Zero</b><p>Bluetooth only. Nothing touches mobile data.</p></div>
+      <div class="mode default"><b>Lite</b><p>The default. Syncs a few times an hour; photos load when you tap.</p></div>
+      <div class="mode"><b>Full</b><p>Syncs every couple of minutes and loads photos automatically.</p></div>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <h2>Private by design</h2>
+    <p class="sub">Built for places where being seen can carry real risk.</p>
+    <div class="grid">
+      <div class="tile"><h3>Who you want stays on your phone</h3><p>Filtering happens on each phone, so your orientation is never broadcast.</p></div>
+      <div class="tile"><h3>A new Bluetooth ID every day</h3><p>Your matches still recognise you, but a stranger's scanner sees a new ID each day. Turn off Visible and nothing is sent at all.</p></div>
+      <div class="tile"><h3>Location rounded to ~2 km</h3><p>It's rounded on your phone before it's sent. Distances show as rough ranges, and photos have their GPS data removed.</p></div>
+    </div>
+  </section>
+
+  <section class="wrap final">
+    <h2>See who's around</h2>
+    <p class="sub" style="margin:0 auto 28px">18+ only. Free while in beta.</p>
+    <div class="ctas"><a class="btn btn-primary" href="__APP_URL__">Try Bluesight</a></div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Bluesight · aketec systems</span>
+    <span><a href="https://github.com/aketec-systems/bluesight">Source on GitHub</a></span>
+  </div>
+</footer>
+</body>
+</html>
