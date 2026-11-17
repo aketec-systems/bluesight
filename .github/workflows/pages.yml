@@ -1,0 +1,68 @@
+name: Web (GitHub Pages)
+
+# Builds the web preview of the app (demo server + simulated people nearby, no backend needed)
+# and publishes it to GitHub Pages at https://bluesight.si
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      EXPO_NO_TELEMETRY: 1
+      CI: 1
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Protocol and server tests
+        run: npm test
+
+      - name: Export the web app
+        working-directory: mobile
+        env:
+          EXPO_PUBLIC_DEMO: '1'
+        run: npx expo export --platform web
+
+      - name: Assemble the site
+        working-directory: mobile
+        run: |
+          mkdir -p ../site
+          node scripts/build-standalone.mjs dist ../site/index.html
+          cp ../site/index.html ../site/404.html
+          echo "bluesight.si" > ../site/CNAME
+          touch ../site/.nojekyll
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4

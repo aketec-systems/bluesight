@@ -1,0 +1,16 @@
+{
+  "name": "@bluesight/protocol",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Bluesight wire formats: Bluetooth cards, envelopes, nearby passes, crypto helpers",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "test": "node --import tsx --test test/*.test.ts",
+    "typecheck": "tsc --noEmit -p ."
+  },
+  "dependencies": {
+    "ed2curve": "0.3.0",
+    "tweetnacl": "1.0.3"
+  }
+}

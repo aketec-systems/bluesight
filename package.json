@@ -1,0 +1,24 @@
+{
+  "name": "bluesight",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "server",
+    "mobile"
+  ],
+  "scripts": {
+    "test": "npm run test -w @bluesight/protocol && npm run test -w bluesight-server",
+    "server": "npm run dev -w bluesight-server",
+    "web": "npm run web -w mobile",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "server:start": "npm start -w bluesight-server"
+  },
+  "devDependencies": {
+    "typescript": "~6.0.3",
+    "tsx": "4.23.15",
+    "@types/node": "^22.10.0"
+  },
+  "engines": {
+    "node": ">=22.13"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "skipLibCheck": true
+  },
+  "include": ["**/*.ts", "**/*.tsx", "../packages/protocol/src/ed2curve.d.ts"],
+  "exclude": ["node_modules", "dist"]
+}
